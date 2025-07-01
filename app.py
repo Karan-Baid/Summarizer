@@ -4,7 +4,7 @@ from langchain.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from langchain.chains.summarize import load_summarize_chain
 from langchain_community.document_loaders  import YoutubeLoader,UnstructuredURLLoader
-from langchain.schema import Document
+from langchain_core.documents import Document
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
 
@@ -60,7 +60,10 @@ if st.button("Summarize"):
             with st.spinner("Waiting...."):
                 if "youtube.com" in url:
                     transcript = get_youtube_transcript(url)
-                    data = [Document(page_content=transcript)]
+                    if transcript.startswith("Transcript error"):
+                            st.error(transcript)
+                            st.stop()  
+                    data = [Document(page_content=transcript)] 
                 else:
                     loader=UnstructuredURLLoader(urls=[url],ssl_verify=False,
                                                  headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"})
