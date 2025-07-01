@@ -22,6 +22,32 @@ Content:{text}
 
 prompt=PromptTemplate(template=prompt_template,input_variables=['text'])
 
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.formatters import TextFormatter
+
+def get_youtube_transcript(video_url):
+    from urllib.parse import urlparse, parse_qs
+
+    
+    query = urlparse(video_url)
+    video_id = parse_qs(query.query).get("v")
+    if not video_id:
+        return None
+    video_id = video_id[0]
+
+    
+    proxies = {
+        "http": "http://57.129.81.201:8080",
+    }
+
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies=proxies)
+        formatter = TextFormatter()
+        return formatter.format_transcript(transcript)
+    except Exception as e:
+        return f"Transcript error: {e}"
+
+
 if st.button("Summarize"):
     if not api_key.strip() or not url.strip():
         st.error("Please provide the information")
@@ -31,12 +57,12 @@ if st.button("Summarize"):
         try:
             with st.spinner("Waiting...."):
                 if "youtube.com" in url:
-                    loader=YoutubeLoader.from_youtube_url(url)
+                    data=get_youtube_transcript(url)
                 else:
                     loader=UnstructuredURLLoader(urls=[url],ssl_verify=False,
                                                  headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"})
                     
-                data=loader.load()
+                    data=loader.load()
 
                 chain=load_summarize_chain(llm,chain_type="stuff",prompt=prompt)
                 summary=chain.run(data)
