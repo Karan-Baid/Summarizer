@@ -39,7 +39,7 @@ def get_youtube_transcript(video_url):
 
     
     proxies = {
-        "http": "http://57.129.81.201:8080",
+        "http": "http://38.147.98.190:8080",
     }
 
     try:
