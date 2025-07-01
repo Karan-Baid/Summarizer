@@ -4,6 +4,9 @@ from langchain.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from langchain.chains.summarize import load_summarize_chain
 from langchain_community.document_loaders  import YoutubeLoader,UnstructuredURLLoader
+from langchain.schema import Document
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.formatters import TextFormatter
 
 st.set_page_config(page_title="LangChain: Summarize Text From YT or Website", page_icon="🦜")
 st.title("🦜 LangChain: Summarize Text From YT or Website")
@@ -22,8 +25,7 @@ Content:{text}
 
 prompt=PromptTemplate(template=prompt_template,input_variables=['text'])
 
-from youtube_transcript_api import YouTubeTranscriptApi
-from youtube_transcript_api.formatters import TextFormatter
+
 
 def get_youtube_transcript(video_url):
     from urllib.parse import urlparse, parse_qs
